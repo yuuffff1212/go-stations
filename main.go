@@ -7,7 +7,7 @@ import (
 	"time"
 
 	"github.com/TechBowl-japan/go-stations/db"
-	"github.com/TechBowl-japan/go-stations/handler"
+	"github.com/TechBowl-japan/go-stations/handler/router"
 )
 
 func main() {
@@ -48,12 +48,11 @@ func realMain() error {
 	}
 	defer todoDB.Close()
 
-	// set http handlers
-	mux := http.NewServeMux()
-	mux.Handle("/healthz", handler.NewHealthzHandler())
+	// NOTE: 新しいエンドポイントの登録はrouter.NewRouterの内部で行うようにする
+	mux := router.NewRouter(todoDB)
 
-	// TODO: ここから実装を行う
-	err = http.ListenAndServe(":8080", mux)
+	// Listen and serve HTTP server
+	err = http.ListenAndServe(port, mux)
 	if err != nil {
 		return err
 	}
